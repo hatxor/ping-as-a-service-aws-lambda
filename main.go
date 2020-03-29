@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -40,7 +41,9 @@ type MyResponse struct {
 
 // Status makes a GET request to a given URL and checks whether or not the
 // resulting status code is 200.
-func Status(siteUrl UrlConfig, result chan UrlResult) {
+func Status(siteUrl UrlConfig, wg *sync.WaitGroup) {
+
+	defer wg.Done()
 
 	var httpClient = &http.Client{
 		Timeout: time.Second * time.Duration(siteUrl.MaxTimeOut),
@@ -94,18 +97,15 @@ func Status(siteUrl UrlConfig, result chan UrlResult) {
 	} else {
 		fmt.Println("Hackalog has said: " + string(resp2.StatusCode))
 	}*/
-
-	result <- response
 }
 
-func checkURLsStatus(URLs []UrlConfig) []UrlResult {
-	results := make([]UrlResult, len(URLs))
-	for k, url := range URLs {
-		result := make(chan UrlResult)
-		go Status(url, result)
-		results[k] = <-result
+func checkURLsStatus(URLs []UrlConfig) {
+	var wg sync.WaitGroup
+	for _, url := range URLs {
+		wg.Add(1)
+		go Status(url, &wg)
 	}
-	return results
+	wg.Wait()
 }
 
 func HandleLambdaEvent(event MyEvent) {
