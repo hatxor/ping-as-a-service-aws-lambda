@@ -88,7 +88,7 @@ func Status(siteUrl UrlConfig, wg *sync.WaitGroup) {
 
 	}
 
-	hackalogURL := fmt.Sprintf("https://hostserver.com/i?u=%s&i=%s&s=%s&m=%s&r=%s", siteUrl.URL, strconv.Itoa(siteUrl.ID), strconv.Itoa(score), strconv.Itoa(match), os.Getenv("AWS_REGION"))
+	hackalogURL := fmt.Sprintf("https://hackalog.scalefast.ninja/i?u=%s&i=%s&s=%s&m=%s&r=%s", siteUrl.URL, strconv.Itoa(siteUrl.ID), strconv.Itoa(score), strconv.Itoa(match), os.Getenv("AWS_REGION"))
 
 	httpClient.Get(hackalogURL)
 
