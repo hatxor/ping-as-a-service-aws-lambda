@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"net/url"
@@ -13,6 +15,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/tcnksm/go-httpstat"
 )
 
 type UrlConfig struct {
@@ -45,11 +48,25 @@ func Status(siteUrl UrlConfig, wg *sync.WaitGroup) {
 
 	defer wg.Done()
 
-	var httpClient = &http.Client{
-		Timeout: time.Second * time.Duration(siteUrl.MaxTimeOut),
+	// Create a new HTTP request
+	req, err := http.NewRequest("GET", siteUrl.URL, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Create a httpstat powered context
+	var result httpstat.Result
+	ctx := httpstat.WithHTTPStat(req.Context(), &result)
+	req = req.WithContext(ctx) // Send request by default HTTP client
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Println(err)
+		return
 	}
 
-	resp, err := httpClient.Get(siteUrl.URL)
+	if _, err := io.Copy(ioutil.Discard, resp.Body); err != nil {
+		log.Fatal(err)
+	}
 
 	var score int = 0
 	var match int = 0
@@ -59,6 +76,7 @@ func Status(siteUrl UrlConfig, wg *sync.WaitGroup) {
 	response.ExceededMaxTimeOut = false
 	response.ContentFound = false
 	response.Error = "false"
+	var now = time.Now()
 
 	if err != nil {
 		//response.Error = fmt.Sprintf("%v", err)
@@ -88,9 +106,24 @@ func Status(siteUrl UrlConfig, wg *sync.WaitGroup) {
 
 	}
 
-	hackalogURL := fmt.Sprintf("https://hackalog.scalefast.ninja/i?u=%s&i=%s&s=%s&m=%s&r=%s", siteUrl.URL, strconv.Itoa(siteUrl.ID), strconv.Itoa(score), strconv.Itoa(match), os.Getenv("AWS_REGION"))
+	var total_time = result.Total(now)
+
+	/**
+	* u: url
+	* i: id
+	* s: status
+	* m: match
+	* r: region
+	* t: total request time duration (in ms)
+	 */
+	hackalogURL := fmt.Sprintf("https://hackalog.scalefast.ninja/i?u=%s&i=%s&s=%s&m=%s&r=%s&t=%d", siteUrl.URL, strconv.Itoa(siteUrl.ID), strconv.Itoa(score), strconv.Itoa(match), os.Getenv("AWS_REGION"), int(total_time/time.Millisecond))
+
+	var httpClient = &http.Client{
+		Timeout: time.Second * 5,
+	}
 
 	httpClient.Get(hackalogURL)
+	defer httpClient.CloseIdleConnections()
 
 	/*if err2 != nil {
 		fmt.Printf("Hackalog error: %v", err2)
