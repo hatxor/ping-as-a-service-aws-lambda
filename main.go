@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -48,6 +49,7 @@ func Status(siteUrl UrlConfig, result chan UrlResult) {
 	resp, err := httpClient.Get(siteUrl.URL)
 
 	var score int = 0
+	var match int = 0
 	var response UrlResult
 	response.ID = siteUrl.ID
 	response.ReceivedCode = 0
@@ -56,7 +58,7 @@ func Status(siteUrl UrlConfig, result chan UrlResult) {
 	response.Error = "false"
 
 	if err != nil {
-		response.Error = fmt.Sprintf("%v", err)
+		//response.Error = fmt.Sprintf("%v", err)
 		if err2, ok := err.(*url.Error); ok {
 			if err3, ok := err2.Err.(net.Error); ok {
 				response.ExceededMaxTimeOut = err3.Timeout()
@@ -73,19 +75,25 @@ func Status(siteUrl UrlConfig, result chan UrlResult) {
 			response.ContentFound = strings.Contains(string(data), siteUrl.Content)
 		}
 
+		if response.ContentFound == true {
+			match = 1
+		}
+
 		if resp.StatusCode == siteUrl.ExpectCode {
 			score = 1
 		}
 
 	}
 
-	resp2, err2 := httpClient.Get("https://hostserver.com/i?u=" + siteUrl.URL + "&s=" + strconv.Itoa(score))
+	hackalogURL := fmt.Sprintf("https://hostserver.com/i?u=%s&i=%s&s=%s&m=%s&r=%s", siteUrl.URL, strconv.Itoa(siteUrl.ID), strconv.Itoa(score), strconv.Itoa(match), os.Getenv("AWS_REGION"))
 
-	if err2 != nil {
+	httpClient.Get(hackalogURL)
+
+	/*if err2 != nil {
 		fmt.Printf("Hackalog error: %v", err2)
 	} else {
 		fmt.Println("Hackalog has said: " + string(resp2.StatusCode))
-	}
+	}*/
 
 	result <- response
 }
@@ -100,8 +108,8 @@ func checkURLsStatus(URLs []UrlConfig) []UrlResult {
 	return results
 }
 
-func HandleLambdaEvent(event MyEvent) (MyResponse, error) {
-	return MyResponse{URLs: checkURLsStatus(event.URLs)}, nil
+func HandleLambdaEvent(event MyEvent) {
+	checkURLsStatus(event.URLs)
 }
 
 func main() {
