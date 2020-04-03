@@ -6,7 +6,7 @@ production:
     - tags
   tags:
     - autoscale-ci
-  image: go:1.14-buster
+  image: golang:1.14-buster
   stage: deploy
   script:
     - make
