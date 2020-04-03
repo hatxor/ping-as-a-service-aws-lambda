@@ -6,7 +6,7 @@ production:
     - tags
   tags:
     - autoscale-ci
-  image: golang:1.14-buster
+  image: golang:1.14.1-buster
   stage: deploy
   before_script:
     # Create a symbolic link under $GOPATH, this is needed for local build
