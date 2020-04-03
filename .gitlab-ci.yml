@@ -1,0 +1,14 @@
+stages:
+  - deploy
+
+production:
+  only:
+    - tags
+  tags:
+    - autoscale-ci
+  image: go:1.14-buster
+  stage: deploy
+  script:
+    - make
+    - serverless deploy --stage production --verbose --region eu-west-1
+    - serverless deploy --stage production --verbose --region us-east-1
