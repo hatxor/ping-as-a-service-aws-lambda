@@ -23,5 +23,19 @@ production:
     - export PATH="$HOME/.serverless/bin:$PATH"
   script:
     - make
+    - serverless deploy --stage production --verbose --region eu-north-1
+    - serverless deploy --stage production --verbose --region ap-south-1
+    - serverless deploy --stage production --verbose --region eu-west-3
+    - serverless deploy --stage production --verbose --region eu-west-2
     - serverless deploy --stage production --verbose --region eu-west-1
+    - serverless deploy --stage production --verbose --region ap-northeast-2
+    - serverless deploy --stage production --verbose --region ap-northeast-1
+    - serverless deploy --stage production --verbose --region sa-east-1
+    - serverless deploy --stage production --verbose --region ca-central-1
+    - serverless deploy --stage production --verbose --region ap-southeast-1
+    - serverless deploy --stage production --verbose --region ap-southeast-2
+    - serverless deploy --stage production --verbose --region eu-central-1
     - serverless deploy --stage production --verbose --region us-east-1
+    - serverless deploy --stage production --verbose --region us-east-2
+    - serverless deploy --stage production --verbose --region us-west-1
+    - serverless deploy --stage production --verbose --region us-west-2
