@@ -8,6 +8,8 @@ production:
     - autoscale-ci
   image: golang:1.14-buster
   stage: deploy
+  before_script:
+    - go get -v -u github.com/golang/dep/...
   script:
     - make
     - serverless deploy --stage production --verbose --region eu-west-1
