@@ -18,6 +18,9 @@ production:
     - cd $CI_PROJECT_NAME
     # Install required dependencies for building the binary
     - go get -v -u github.com/golang/dep/...
+    # Install serverless utility
+    - curl -o- -L https://slss.io/install | bash
+    - export PATH="$HOME/.serverless/bin:$PATH"
   script:
     - make
     - serverless deploy --stage production --verbose --region eu-west-1
