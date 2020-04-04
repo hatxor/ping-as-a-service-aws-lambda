@@ -26,7 +26,7 @@ type URLConfig struct {
 	Content    string `json:"content"`
 }
 
-type MyEvent struct {
+type Event struct {
 	URLs []URLConfig `json:"urls"`
 }
 
@@ -36,10 +36,6 @@ type URLResult struct {
 	ExceededMaxTimeOut bool   `json:"exceeded_max_timeout"`
 	ContentFound       bool   `json:"content_found"`
 	Error              string `json:"error"`
-}
-
-type MyResponse struct {
-	URLs []URLResult `json:"urls"`
 }
 
 // Status makes a GET request to a given URL and checks whether or not the
@@ -125,11 +121,6 @@ func Status(siteURL URLConfig, wg *sync.WaitGroup) {
 	httpClient.Get(hackalogURL)
 	defer httpClient.CloseIdleConnections()
 
-	/*if err2 != nil {
-		fmt.Printf("Hackalog error: %v", err2)
-	} else {
-		fmt.Println("Hackalog has said: " + string(resp2.StatusCode))
-	}*/
 }
 
 func checkURLsStatus(URLs []URLConfig) {
@@ -141,7 +132,7 @@ func checkURLsStatus(URLs []URLConfig) {
 	wg.Wait()
 }
 
-func HandleLambdaEvent(event MyEvent) {
+func HandleLambdaEvent(event Event) {
 	checkURLsStatus(event.URLs)
 }
 
