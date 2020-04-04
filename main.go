@@ -42,10 +42,6 @@ type MyResponse struct {
 	URLs []URLResult `json:"urls"`
 }
 
-func getTotalTime(r *httpstat.Result) time.Duration {
-	return r.Connect + r.DNSLookup + r.NameLookup + r.Pretransfer + r.ServerProcessing + r.StartTransfer + r.TCPConnection + r.TLSHandshake
-}
-
 // Status makes a GET request to a given URL and checks whether or not the
 // resulting status code is 200.
 func Status(siteURL URLConfig, wg *sync.WaitGroup) {
@@ -96,6 +92,9 @@ func Status(siteURL URLConfig, wg *sync.WaitGroup) {
 	response.ReceivedCode = resp.StatusCode
 
 	data, err := ioutil.ReadAll(resp.Body)
+	var now = time.Now()
+	result.End(now)
+	var totalTime = result.Total(now)
 
 	if err == nil {
 		response.ContentFound = strings.Contains(string(data), siteURL.Content)
@@ -108,8 +107,6 @@ func Status(siteURL URLConfig, wg *sync.WaitGroup) {
 	if resp.StatusCode == siteURL.ExpectCode {
 		score = 1
 	}
-
-	var totalTime = getTotalTime(&result)
 
 	/**
 	* u: url
