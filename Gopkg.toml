@@ -3,4 +3,13 @@
 
 [[constraint]]
   name = "github.com/aws/aws-lambda-go"
-  version = "1.x"
+  version = "1.16.0"
+
+[[constraint]]
+  name = "github.com/tcnksm/go-httpstat"
+  revision = "e866bb2744199f5421f2d795b09dc184aac7adcc"
+
+
+[prune]
+  go-tests = true
+  unused-packages = true

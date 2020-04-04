@@ -2,7 +2,7 @@
 
 
 [[projects]]
-  digest = "1:ad3a958de5100511e795bc6abd52a039b9538b7e42d7b393af962238aaa584ef"
+  digest = "1:d92a0c10fb57de8742c33500c2fd96bd202fcafd14cb247d5185578f86b276fb"
   name = "github.com/aws/aws-lambda-go"
   packages = [
     "lambda",
@@ -10,17 +10,16 @@
     "lambda/messages",
     "lambdacontext",
   ]
-  pruneopts = ""
+  pruneopts = "UT"
   revision = "18b606949c45bc923e421d7ea891d6d02a34f7dd"
   version = "v1.16.0"
 
 [[projects]]
-  digest = "1:35868eeec745e55d3d73824919156469b2233134702454128e463d81983e72ce"
+  digest = "1:b60bff25bc6f57cd94f72d91de2f35c3fcbb57b61e7b8af74998ee2b0bdb7b4f"
   name = "github.com/tcnksm/go-httpstat"
   packages = ["."]
-  pruneopts = ""
-  revision = "ae0d799e7ee65d3dc46d7272368daa830aef6c5a"
-  version = "v0.2.0"
+  pruneopts = "UT"
+  revision = "e866bb2744199f5421f2d795b09dc184aac7adcc"
 
 [solve-meta]
   analyzer-name = "dep"
